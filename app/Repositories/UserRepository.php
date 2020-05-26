@@ -1,6 +1,8 @@
 <?php
 namespace App\Repositories;
 
+use App\User;
+
 class UserRepository
 {
     public function get_active_users_from_ral() {
@@ -16,13 +18,15 @@ class UserRepository
             $reddit_id   = $v['children'][2]['children'][0]['html'];
             $update_time = $v['children'][3]['html'];
 
-            $users[] = array(
+            $user_data = array(
                 'mal_id'      => $mal_id,
                 'reddit_id'   => $reddit_id,
                 'update_time' => $update_time
             );
 
-            $this->update_user_by_mal_id($mal_id);
+            $users[] = $user_data;
+
+            $this->create_or_update($user_data);
         }
         unset($array);
         
@@ -30,23 +34,23 @@ class UserRepository
     }
     
     public function get_user_mal($mal_id, $list = 'ptw') {
-        $user_ptw = json_decode(file_get_contents("https://api.jikan.moe/v3/user/{$mal_id}/animelist/{$list}"), true);
+        $userlist = json_decode(file_get_contents("https://api.jikan.moe/v3/user/{$mal_id}/animelist/{$list}"), true);
 
-        $user_ptw_count = count($user_ptw['anime']);
+        $userlist_count = count($userlist['anime']);
 
-        if ($user_ptw_count >= 500) {
+        if ($userlist_count >= 500) {
             return 0;
-        } else if ($user_ptw_count >= 50) {
-            $weight = 50/$user_ptw_count;
+        } else if ($userlist_count >= 50) {
+            $weight = 50/$userlist_count;
         } else {
             $weight = 1;
         }
 
-        $user_data = array();
-        $user_data['weight'] = $weight;
+        $userlist_data = array();
+        $userlist_data['weight'] = $weight;
 
-        foreach ($user_ptw['anime'] as $k => $v) {
-            $user_data['anime'][] = array(
+        foreach ($userlist['anime'] as $k => $v) {
+            $userlist_data['anime'][] = array(
                 'mal_id'      => $v['mal_id'],
                 'title'       => $v['title'],
                 'type'        => $v['type'],
@@ -56,9 +60,28 @@ class UserRepository
             );
         }
         
-        return $user_data;
+        return $userlist_data;
     }
-    
+
+    public function create_or_update($user_data) {
+        $user = App\User::where('name', $user_data['reddit_id'])->first();
+
+        if ($user) {
+            if ($user->mal_id != $user_data['mal_id']) {
+                $user->mal_id = $user_data['mal_id'];
+
+                $user->save();
+            }
+        } else {
+            $new_user = new User;
+
+            $new_user->mal_id    = $user_data['mal_id'];
+            $new_user->reddit_id = $user_data['reddit_id'];
+
+            $new_user->save();
+        }
+    }
+
     function html_to_obj($html) {
         $dom = new DOMDocument();
         $dom->loadHTML($html);
