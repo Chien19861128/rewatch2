@@ -5,7 +5,7 @@ use App\Repositories\SeriesRepository;
 use App\Repositories\UserListRepository;
 use App\Repositories\SumListRepository;
 
-class UserServices
+class UserListServices
 {
     protected $User, $Series, $UserList, $SumList;
 
@@ -21,16 +21,31 @@ class UserServices
         $this->SumList = $SumList;
     }
     
-    public function sync_users() {
+    public function sync_all_user_lists() {
         $active_users = $this->User->get_active_users_from_ral();
         
         foreach ($active_users as $k => $v) {
             $user_ptw = $this->User->get_user_mal($v['mal_id'], 'ptw');
-
-            sleep(2);
+            $this->update_lists($v['mal_id'], 'ptw', $user_ptw);
 
             $user_watching = $this->User->get_user_mal($v['mal_id'], 'watching');
-            sleep(2);
+            $this->update_lists($v['mal_id'], 'watching', $user_watching);
         }
+    }
+
+    function update_lists ($mal_user_id, $status, $user_list) {
+        foreach ($user_list as $k => $v) {;
+            $this->Series->create_or_update($v);
+
+            $list_data = array(
+                'mal_user_id'    => $mal_user_id,
+                'mal_series_id'  => $v['mal_id'],
+                'status'         => $status,
+                'weighted_score' => $v['weight'],
+            );
+            $this->UserList->create_or_update($list_data);
+            $this->SumList->create_or_update($list_data);
+        }
+        sleep(2);
     }
 }
