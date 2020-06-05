@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Services\UserListService;
+use App\Services\UserListService;
 
 class JikanController extends BaseController
 {

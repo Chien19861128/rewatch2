@@ -83,8 +83,30 @@ class UserRepository
     }
 
     function html_to_obj($html) {
-        $dom = new DOMDocument();
+        //$html = htmlentities($html);
+        //$html = html_entity_decode($html);
+
+        $html = str_replace("&", "&amp;", $html);
+
+
+        //print_r($html);die;
+        //$html = $html->getElementsByTagName('body');
+        $dom = new \DOMDocument();
+        //$dom->strictErrorChecking = false;
+
+        // set error level
+        //$internalErrors = libxml_use_internal_errors(true);
+
         $dom->loadHTML($html);
+
+        //$body = $dom->getElementsByTagName('body');
+
+        //$dom->loadHTML($html);
+
+        // Restore error level
+        //libxml_use_internal_errors($internalErrors);
+
+        print_r($dom->documentElement);die;
         return $this->element_to_obj($dom->documentElement);
     }
     
@@ -101,6 +123,7 @@ class UserRepository
                 $obj["children"][] = $this->element_to_obj($subElement);
             }
         }
+        print_r($obj);die;
         return $obj;
     }
 }

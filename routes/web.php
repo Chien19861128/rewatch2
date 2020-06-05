@@ -14,3 +14,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get("/Jikan/update_lists","JikanController@update_lists");

@@ -5,7 +5,7 @@ use App\Repositories\SeriesRepository;
 use App\Repositories\UserListRepository;
 use App\Repositories\SumListRepository;
 
-class UserListServices
+class UserListService
 {
     protected $User, $Series, $UserList, $SumList;
 
