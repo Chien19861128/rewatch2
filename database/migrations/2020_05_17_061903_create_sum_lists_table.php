@@ -14,11 +14,11 @@ class CreateSumListsTable extends Migration
     public function up()
     {
         Schema::create('sum_lists', function (Blueprint $table) {
-            $table->string('mal_series_id', 10)->primary();
+            $table->string('mal_series_id', 50)->primary();
             $table->integer('total_watching');
             $table->integer('total_ptw');
-            $table->integer('weighted_watching_score');
-            $table->integer('weighted_ptw_score');
+            $table->float('weighted_watching_score', 11, 4);
+            $table->float('weighted_ptw_score', 11, 4);
             $table->timestamps();
         });
     }

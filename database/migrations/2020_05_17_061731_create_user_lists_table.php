@@ -14,7 +14,7 @@ class CreateUserListsTable extends Migration
     public function up()
     {
         Schema::create('user_lists', function (Blueprint $table) {
-            $table->string('mal_user_id', 10);
+            $table->string('mal_user_id', 50);
             $table->string('mal_series_id', 10);
             $table->tinyInteger('status');
             $table->float('weighted_score', 4, 4);

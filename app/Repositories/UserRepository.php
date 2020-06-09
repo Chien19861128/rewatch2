@@ -2,34 +2,49 @@
 namespace App\Repositories;
 
 use App\User;
+use voku\helper\HtmlDomParser;
 
 class UserRepository
 {
     public function get_active_users_from_ral() {
-        $html = file_get_contents('http://www.redditanimelist.net/users.php?time=Week');
 
-        $array = $this->html_to_obj($html);
+        $html = HtmlDomParser::file_get_html('http://www.redditanimelist.net/users.php?time=Week');
+
+        $table = $html->find('.users');
+
+        // initialize empty array to store the data array from each row
         $users = array();
 
-        foreach ($array['children'][1]['children'][0]['children'][5]['children'] as $k => $v) {
-            if ($k == 0) continue;
+        // loop over rows
+        foreach($table->find('tr') as $row) {
 
-            $mal_id      = $v['children'][1]['children'][0]['html'];
-            $reddit_id   = $v['children'][2]['children'][0]['html'];
-            $update_time = $v['children'][3]['html'];
+            // initialize array to store the cell data from each row
+            $rowData = array();
+            foreach($row->find('td') as $cell) {
+                $inner_text = '';
+                // push the cell's text to the array
+                foreach($cell->find('a') as $cell2) {
+                    $inner_text = $cell2->innertext;
+                }
+                $rowData[] = (!empty($inner_text)) ? $inner_text : $cell->innertext;
+            }
 
-            $user_data = array(
-                'mal_id'      => $mal_id,
-                'reddit_id'   => $reddit_id,
-                'update_time' => $update_time
-            );
+            // push the row's data array to the 'big' array
 
-            $users[] = $user_data;
+            if (count($rowData) == 4) {
 
-            $this->create_or_update($user_data);
+                $user_data = array(
+                    'mal_id'      => $rowData[2],
+                    'reddit_id'   => $rowData[1],
+                    'update_time' => $rowData[3]
+                );
+
+                $this->create_or_update($user_data);
+
+                $users[] = $user_data;
+            }
         }
-        unset($array);
-        
+
         return $users;
     }
     
@@ -64,66 +79,21 @@ class UserRepository
     }
 
     public function create_or_update($user_data) {
-        $user = App\User::where('name', $user_data['reddit_id'])->first();
+        $user = User::where('name', $user_data['reddit_id'])->first();
 
         if ($user) {
-            if ($user->mal_id != $user_data['mal_id']) {
-                $user->mal_id = $user_data['mal_id'];
+            if ($user->mal_user_id != $user_data['mal_id']) {
+                $user->mal_user_id = $user_data['mal_id'];
 
                 $user->save();
             }
         } else {
             $new_user = new User;
 
-            $new_user->mal_id    = $user_data['mal_id'];
-            $new_user->reddit_id = $user_data['reddit_id'];
+            $new_user->mal_user_id = $user_data['mal_id'];
+            $new_user->name        = $user_data['reddit_id'];
 
             $new_user->save();
         }
-    }
-
-    function html_to_obj($html) {
-        //$html = htmlentities($html);
-        //$html = html_entity_decode($html);
-
-        $html = str_replace("&", "&amp;", $html);
-
-
-        //print_r($html);die;
-        //$html = $html->getElementsByTagName('body');
-        $dom = new \DOMDocument();
-        //$dom->strictErrorChecking = false;
-
-        // set error level
-        //$internalErrors = libxml_use_internal_errors(true);
-
-        $dom->loadHTML($html);
-
-        //$body = $dom->getElementsByTagName('body');
-
-        //$dom->loadHTML($html);
-
-        // Restore error level
-        //libxml_use_internal_errors($internalErrors);
-
-        print_r($dom->documentElement);die;
-        return $this->element_to_obj($dom->documentElement);
-    }
-    
-    function element_to_obj($element) {
-        //$obj = array( "tag" => $element->tagName );
-        $obj = array();
-        foreach ($element->attributes as $attribute) {
-            $obj[$attribute->name] = $attribute->value;
-        }
-        foreach ($element->childNodes as $subElement) {
-            if ($subElement->nodeType == XML_TEXT_NODE) {
-                $obj["html"] = $subElement->wholeText;
-            } else {
-                $obj["children"][] = $this->element_to_obj($subElement);
-            }
-        }
-        print_r($obj);die;
-        return $obj;
     }
 }
