@@ -15,10 +15,10 @@ class CreateSumListsTable extends Migration
     {
         Schema::create('sum_lists', function (Blueprint $table) {
             $table->string('mal_series_id', 50)->primary();
-            $table->integer('total_watching');
-            $table->integer('total_ptw');
-            $table->float('weighted_watching_score', 11, 4);
-            $table->float('weighted_ptw_score', 11, 4);
+            $table->integer('total_watching')->nullable();
+            $table->integer('total_ptw')->nullable();
+            $table->decimal('weighted_watching_score', 14, 4)->nullable();
+            $table->decimal('weighted_ptw_score', 14, 4)->nullable();
             $table->timestamps();
         });
     }

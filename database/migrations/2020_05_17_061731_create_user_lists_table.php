@@ -17,8 +17,8 @@ class CreateUserListsTable extends Migration
             $table->string('mal_user_id', 50);
             $table->string('mal_series_id', 10);
             $table->tinyInteger('status');
-            $table->float('weighted_score', 4, 4);
-            $table->tinyInteger('episode');
+            $table->decimal('weighted_score', 8, 4);
+            $table->tinyInteger('episode')->nullable();
             $table->primary(['mal_user_id', 'mal_series_id']);
             $table->timestamps();
         });

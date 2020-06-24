@@ -20,7 +20,8 @@ class SeriesRepository
     }
 
     function create_or_update($series_data) {
-        $series = App\Series::find($series_data['mal_id']);
+
+        $series = Series::find($series_data['mal_series_id']);
 
         $year_season = $series_data['year'] + $this->season_calculator($series_data['season']);
 
@@ -36,13 +37,13 @@ class SeriesRepository
         } else {
             $new_series = new Series;
 
-            $new_series->mal_id      = $series_data['mal_id'];
-            $new_series->title1      = $series_data['title'];
-            $new_series->type        = $series_data['type'];
-            $new_series->episodes    = $series_data['episodes'];
-            $new_series->season      = $series_data['season'];
-            $new_series->year        = $series_data['year'];
-            $new_series->year_season = $year_season;
+            $new_series->mal_series_id = $series_data['mal_series_id'];
+            $new_series->title1        = $series_data['title'];
+            $new_series->type          = $series_data['type'];
+            $new_series->episodes      = $series_data['episodes'];
+            $new_series->season        = $series_data['season'];
+            $new_series->year          = $series_data['year'];
+            $new_series->year_season   = $year_season;
 
             $new_series->save();
         }

@@ -7,7 +7,7 @@ use App\SumList;
 class SumListRepository
 {
     function create_or_update($sumlist_data) {
-        $sumlist = App\SumList::find($sumlist_data['mal_series_id']);
+        $sumlist = SumList::find($sumlist_data['mal_series_id']);
 
         if ($sumlist) {
             if ($sumlist_data['status'] == 'ptw') {
@@ -22,7 +22,7 @@ class SumListRepository
         } else {
             $new_sumlist = new SumList;
 
-            $new_sumlist->mal_series_id = $sumlist_data['mal_user_id'];
+            $new_sumlist->mal_series_id = $sumlist_data['mal_series_id'];
             if ($sumlist_data['status'] == 'ptw') {
                 $new_sumlist->total_ptw          += 1;
                 $new_sumlist->weighted_ptw_score += $sumlist_data['weighted_score'];
@@ -39,7 +39,7 @@ class SumListRepository
 
         return DB::select('
             SELECT sum_lists.*, series.title1, series.type, series.year, series.season FROM sum_lists 
-            JOIN series ON sum_lists.mal_series_id = series.mal_id
+            JOIN series ON sum_lists.mal_series_id = series.mal_series_id
             ORDER BY (sum_lists.weighted_ptw_score + sum_lists.weighted_watching_score) DESC
             LIMIT :limit OFFSET :offset
             ', ['limit' => 200, 'offset' => 0]);

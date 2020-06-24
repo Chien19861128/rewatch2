@@ -16,12 +16,12 @@ class CreateSeriesTable extends Migration
         Schema::create('series', function (Blueprint $table) {
             $table->string('mal_series_id', 50)->primary();
             $table->string('title1');
-            $table->string('title2');
-            $table->string('title3');
+            $table->string('title2')->nullable();
+            $table->string('title3')->nullable();
             $table->smallInteger('year');
-            $table->tinyInteger('season');
-            $table->float('year_season', 4, 4);
-            $table->tinyInteger('type');
+            $table->string('season', 6);
+            $table->decimal('year_season', 8, 4);
+            $table->string('type', 10);
             $table->smallInteger('episodes');
             $table->timestamps();
         });
