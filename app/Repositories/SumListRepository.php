@@ -11,8 +11,8 @@ class SumListRepository
 
         if ($sumlist) {
             if ($sumlist_data['status'] == 'ptw') {
-                $sumlist->total_ptw          += 1;
-                $sumlist->weighted_ptw_score += $sumlist_data['weighted_score'];
+                $sumlist->total_ptw               += 1;
+                $sumlist->weighted_ptw_score      += $sumlist_data['weighted_score'];
             } else if ($sumlist_data['status'] == 'watching') {
                 $sumlist->total_watching          += 1;
                 $sumlist->weighted_watching_score += $sumlist_data['weighted_score'];
@@ -24,9 +24,13 @@ class SumListRepository
 
             $new_sumlist->mal_series_id = $sumlist_data['mal_series_id'];
             if ($sumlist_data['status'] == 'ptw') {
-                $new_sumlist->total_ptw          = 1;
-                $new_sumlist->weighted_ptw_score = $sumlist_data['weighted_score'];
+                $new_sumlist->total_ptw               = 1;
+                $new_sumlist->weighted_ptw_score      = $sumlist_data['weighted_score'];
+                $new_sumlist->total_watching          = 0;
+                $new_sumlist->weighted_watching_score = 0.0000;
             } else if ($sumlist_data['status'] == 'watching') {
+                $new_sumlist->total_ptw               = 0;
+                $new_sumlist->weighted_ptw_score      = 0.0000;
                 $new_sumlist->total_watching          = 1;
                 $new_sumlist->weighted_watching_score = $sumlist_data['weighted_score'];
             }
