@@ -81,7 +81,7 @@ class UserRepository
             }
 
             return $userlist_data;
-        } catch (Throwable $e) {
+        } catch (\Exception $e) {
 
             return false;
         }
