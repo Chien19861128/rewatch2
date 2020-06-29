@@ -18,6 +18,8 @@ class JikanController extends BaseController
     }
 
     public function update_lists() {
+        set_time_limit(0);
+
         $this->UserList->sync_all_user_lists();
     }
 }
